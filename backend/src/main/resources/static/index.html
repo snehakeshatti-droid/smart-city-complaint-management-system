@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,6 +66,20 @@
             font-weight: bold;
         }
 
+        select {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            background: white;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        select:disabled {
+            cursor: wait;
+            opacity: 0.6;
+        }
+
         button {
             background: #0f766e;
             color: white;
@@ -109,7 +124,7 @@
                 <p>Resolved: <strong id="resolved">0</strong></p>
             </div>
 
-            <button onclick="loadComplaints()">
+            <button id="refreshButton" onclick="loadComplaints()">
                 Refresh Complaints
             </button>
         </section>
@@ -117,7 +132,9 @@
         <section class="table-container">
             <h2>All Complaints</h2>
 
-            <p id="message">Loading complaints...</p>
+            <p id="message" role="status" aria-live="polite">
+                Loading complaints...
+            </p>
 
             <table>
                 <thead>
@@ -143,9 +160,11 @@
         async function loadComplaints() {
             const message = document.getElementById("message");
             const table = document.getElementById("complaintTable");
+            const refreshButton = document.getElementById("refreshButton");
 
             message.textContent = "Loading complaints...";
             table.replaceChildren();
+            refreshButton.disabled = true;
 
             try {
                 const response = await fetch("/api/complaints");
@@ -156,6 +175,10 @@
 
                 const complaints = await response.json();
 
+                if (!Array.isArray(complaints)) {
+                    throw new Error("Invalid complaint data received.");
+                }
+
                 let pending = 0;
                 let progress = 0;
                 let resolved = 0;
@@ -165,43 +188,131 @@
                     // Count complaints by status
                     if (complaint.status === "Pending") {
                         pending++;
-                    }
-
-                    if (complaint.status === "In Progress") {
+                    } else if (complaint.status === "In Progress") {
                         progress++;
-                    }
-
-                    if (complaint.status === "Resolved") {
+                    } else if (complaint.status === "Resolved") {
                         resolved++;
                     }
 
-                    // Create one table row for each complaint
                     const row = document.createElement("tr");
 
-                    // Values appear in the same order as the headings
+                    // Complaint details before status
                     const values = [
                         complaint.complaint_id,
                         complaint.citizen_name,
                         complaint.category_name,
                         complaint.zone_name,
-                        complaint.description,
-                        complaint.status,
-                        complaint.priority,
-                        complaint.complaint_date
+                        complaint.description
                     ];
 
-                    values.forEach(function (value, index) {
+                    values.forEach(function (value) {
                         const cell = document.createElement("td");
-
                         cell.textContent = value ?? "-";
-
-                        // Make the status bold
-                        if (index === 5) {
-                            cell.className = "status";
-                        }
-
                         row.appendChild(cell);
                     });
+
+                    // Status dropdown
+                    const statusCell = document.createElement("td");
+                    statusCell.className = "status";
+
+                    const statusSelect = document.createElement("select");
+                    statusSelect.setAttribute(
+                        "aria-label",
+                        "Status for complaint " + complaint.complaint_id
+                    );
+
+                    const allowedStatuses = [
+                        "Pending",
+                        "In Progress",
+                        "Resolved"
+                    ];
+
+                    allowedStatuses.forEach(function (status) {
+                        const option = document.createElement("option");
+                        option.value = status;
+                        option.textContent = status;
+
+                        if (status === complaint.status) {
+                            option.selected = true;
+                        }
+
+                        statusSelect.appendChild(option);
+                    });
+
+                    statusSelect.addEventListener("change", async function () {
+                        const newStatus = statusSelect.value;
+
+                        statusSelect.disabled = true;
+                        message.textContent =
+                            "Updating complaint #" +
+                            complaint.complaint_id + "...";
+
+                        try {
+                            const updateResponse = await fetch(
+                                "/api/complaints/" +
+                                complaint.complaint_id + "/status",
+                                {
+                                    method: "PUT",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        status: newStatus
+                                    })
+                                }
+                            );
+
+                            if (!updateResponse.ok) {
+                                let errorMessage = "Status update failed.";
+
+                                try {
+                                    const errorData =
+                                        await updateResponse.json();
+
+                                    errorMessage =
+                                        errorData.detail ||
+                                        errorData.message ||
+                                        errorData.error ||
+                                        errorMessage;
+                                } catch (ignored) {
+                                    // Keep the default error message.
+                                }
+
+                                throw new Error(errorMessage);
+                            }
+
+                            message.textContent =
+                                "Complaint #" +
+                                complaint.complaint_id +
+                                " updated successfully.";
+
+                            // Reload table and summary counts
+                            await loadComplaints();
+
+                        } catch (error) {
+                            message.textContent =
+                                "Could not update status: " + error.message;
+
+                            // Restore the saved status from the server
+                            await loadComplaints();
+
+                        } finally {
+                            statusSelect.disabled = false;
+                        }
+                    });
+
+                    statusCell.appendChild(statusSelect);
+                    row.appendChild(statusCell);
+
+                    // Priority
+                    const priorityCell = document.createElement("td");
+                    priorityCell.textContent = complaint.priority ?? "-";
+                    row.appendChild(priorityCell);
+
+                    // Complaint date
+                    const dateCell = document.createElement("td");
+                    dateCell.textContent = complaint.complaint_date ?? "-";
+                    row.appendChild(dateCell);
 
                     table.appendChild(row);
                 });
@@ -210,30 +321,32 @@
                 document.getElementById("total").textContent =
                     complaints.length;
 
-                document.getElementById("pending").textContent =
-                    pending;
+                document.getElementById("pending").textContent = pending;
+                document.getElementById("progress").textContent = progress;
+                document.getElementById("resolved").textContent = resolved;
 
-                document.getElementById("progress").textContent =
-                    progress;
-
-                document.getElementById("resolved").textContent =
-                    resolved;
-
-                message.textContent = complaints.length === 0
-                    ? "No complaints found."
-                    : "Complaints loaded successfully.";
+                if (complaints.length === 0) {
+                    message.textContent = "No complaints found.";
+                } else if (message.textContent === "Loading complaints...") {
+                    message.textContent = "Complaints loaded successfully.";
+                } else if (!message.textContent.startsWith("Complaint #")) {
+                    message.textContent = "Complaints loaded successfully.";
+                }
 
             } catch (error) {
                 message.textContent =
-                    "Unable to load complaints. Check whether the Java backend is running.";
+                    "Unable to load complaints. " + error.message;
 
                 console.error("Error loading complaints:", error);
+
+            } finally {
+                refreshButton.disabled = false;
             }
         }
 
-        // Load complaints when the page
-                // Load complaints when the page opens
+        // Load complaints when the page opens
         window.addEventListener("DOMContentLoaded", loadComplaints);
     </script>
+
 </body>
 </html>
