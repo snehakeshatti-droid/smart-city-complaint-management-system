@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Complaint Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f766e;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px #00000010;
+        }
+
+        .summary h2 {
+            margin-top: 0;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #e2e8f0;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        button {
+            background: #0f766e;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #115e59;
+        }
+
+        #message {
+            margin: 15px 0;
+        }
+
+        .counts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Smart City Complaint Management System</h1>
+        <p>Public Complaint Dashboard</p>
+    </header>
+
+    <main>
+
+        <section class="summary">
+            <h2>Complaint Overview</h2>
+
+            <div class="counts">
+                <p>Total Complaints: <strong id="total">0</strong></p>
+                <p>Pending: <strong id="pending">0</strong></p>
+                <p>In Progress: <strong id="progress">0</strong></p>
+                <p>Resolved: <strong id="resolved">0</strong></p>
+            </div>
+
+            <button onclick="loadComplaints()">
+                Refresh Complaints
+            </button>
+        </section>
+
+        <section class="table-container">
+            <h2>All Complaints</h2>
+
+            <p id="message">Loading complaints...</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Citizen</th>
+                        <th>Category</th>
+                        <th>Zone</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="complaintTable"></tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <script>
+        async function loadComplaints() {
+            const message = document.getElementById("message");
+            const table = document.getElementById("complaintTable");
+
+            message.textContent = "Loading complaints...";
+            table.replaceChildren();
+
+            try {
+                const response = await fetch("/api/complaints");
+
+                if (!response.ok) {
+                    throw new Error("Could not load complaints.");
+                }
+
+                const complaints = await response.json();
+
+                let pending = 0;
+                let progress = 0;
+                let resolved = 0;
+
+                complaints.forEach(function (complaint) {
+
+                    // Count complaints by status
+                    if (complaint.status === "Pending") {
+                        pending++;
+                    }
+
+                    if (complaint.status === "In Progress") {
+                        progress++;
+                    }
+
+                    if (complaint.status === "Resolved") {
+                        resolved++;
+                    }
+
+                    // Create one table row for each complaint
+                    const row = document.createElement("tr");
+
+                    // Values appear in the same order as the headings
+                    const values = [
+                        complaint.complaint_id,
+                        complaint.citizen_name,
+                        complaint.category_name,
+                        complaint.zone_name,
+                        complaint.description,
+                        complaint.status,
+                        complaint.priority,
+                        complaint.complaint_date
+                    ];
+
+                    values.forEach(function (value, index) {
+                        const cell = document.createElement("td");
+
+                        cell.textContent = value ?? "-";
+
+                        // Make the status bold
+                        if (index === 5) {
+                            cell.className = "status";
+                        }
+
+                        row.appendChild(cell);
+                    });
+
+                    table.appendChild(row);
+                });
+
+                // Update dashboard totals
+                document.getElementById("total").textContent =
+                    complaints.length;
+
+                document.getElementById("pending").textContent =
+                    pending;
+
+                document.getElementById("progress").textContent =
+                    progress;
+
+                document.getElementById("resolved").textContent =
+                    resolved;
+
+                message.textContent = complaints.length === 0
+                    ? "No complaints found."
+                    : "Complaints loaded successfully.";
+
+            } catch (error) {
+                message.textContent =
+                    "Unable to load complaints. Check whether the Java backend is running.";
+
+                console.error("Error loading complaints:", error);
+            }
+        }
+
+        // Load complaints when the page
