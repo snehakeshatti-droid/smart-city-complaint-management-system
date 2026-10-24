@@ -4,923 +4,1005 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart City | Complaint Management</title>
+    <title>Smart City Complaint Management</title>
 
     <style>
-        :root {
-            --primary: #0f766e;
-            --primary-dark: #115e59;
-            --primary-light: #ccfbf1;
-            --background: #f4f7fb;
-            --white: #ffffff;
-            --text: #172b4d;
-            --muted: #64748b;
-            --border: #e5eaf1;
-            --shadow: 0 5px 22px rgba(15, 23, 42, 0.05);
-        }
-
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
 
         body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: var(--background);
-            color: var(--text);
-        }
-
-        button, input, select {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        .layout {
-            display: flex;
+            background: #f1f5f9;
+            color: #1e293b;
             min-height: 100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 245px;
-            flex-shrink: 0;
-            background: #103b3b;
+        header {
+            background: #123b63;
             color: white;
-            padding: 28px 18px;
-        }
-
-        .brand {
+            padding: 22px 6%;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            padding: 0 8px 30px;
-            border-bottom: 1px solid #ffffff24;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .brand-icon {
-            display: grid;
-            place-items: center;
-            width: 44px;
-            height: 44px;
-            background: #14b8a6;
-            border-radius: 13px;
+        header h1 {
             font-size: 23px;
         }
 
-        .brand h2 {
-            margin: 0;
-            font-size: 17px;
-        }
-
-        .brand p {
-            margin: 5px 0 0;
-            color: #b9d9d6;
-            font-size: 12px;
-        }
-
-        .nav-label {
-            margin: 30px 10px 12px;
-            color: #a6c7c4;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-        }
-
-        .nav-item {
-            padding: 13px 12px;
-            margin: 7px 0;
-            border-radius: 9px;
-            color: #d8e9e7;
-            font-size: 14px;
-        }
-
-        .nav-item.active {
-            background: #176b65;
-            color: white;
-            font-weight: 600;
-        }
-
-        .sidebar-note {
-            margin-top: 45px;
-            padding: 15px;
-            border-radius: 12px;
-            background: #ffffff10;
-            color: #d8e9e7;
-            font-size: 12px;
-            line-height: 1.7;
-        }
-
-        .sidebar-note strong {
-            display: block;
-            color: white;
+        header p {
+            margin-top: 6px;
+            color: #dbeafe;
             font-size: 13px;
         }
 
-        /* Main area */
-        .main {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            padding: 20px 34px;
-            background: white;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .topbar small {
-            color: var(--muted);
-        }
-
-        .topbar h1 {
-            margin: 5px 0 0;
-            font-size: 21px;
-        }
-
-        .admin-chip {
-            padding: 10px 14px;
-            background: #ecfdf5;
-            border: 1px solid #d1fae5;
-            border-radius: 30px;
-            color: #047857;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .content {
-            max-width: 1500px;
-            margin: auto;
-            padding: 30px 34px;
-        }
-
-        .welcome {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .welcome h2 {
-            margin: 0 0 8px;
-            font-size: 24px;
-        }
-
-        .welcome p {
-            margin: 0;
-            color: var(--muted);
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 16px;
+            cursor: pointer;
             font-size: 14px;
+            font-weight: bold;
         }
 
-        .button {
-            border: 0;
-            border-radius: 9px;
-            padding: 12px 16px;
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .button:hover {
-            background: var(--primary-dark);
-        }
-
-        .button:disabled {
-            cursor: wait;
+        button:disabled {
             opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        /* Summary cards */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .success {
+            background: #15803d;
+            color: white;
+        }
+
+        main {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 18px 40px;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #1d4ed8, #0f766e);
+            color: white;
+            padding: 30px;
+            border-radius: 14px;
             margin-bottom: 25px;
         }
 
-        .stat-card {
-            background: white;
-            padding: 22px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            box-shadow: var(--shadow);
+        .hero h2 {
+            font-size: 27px;
+            margin-bottom: 10px;
         }
 
-        .stat-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
+        .hero p {
+            line-height: 1.6;
         }
 
-        .stat-label {
-            color: var(--muted);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .stat-icon {
+        .grid {
             display: grid;
-            place-items: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            font-size: 20px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
         }
 
-        .icon-total {
-            background: #e0f2fe;
-        }
-
-        .icon-pending {
-            background: #fef3c7;
-        }
-
-        .icon-progress {
-            background: #dbeafe;
-        }
-
-        .icon-resolved {
-            background: #d1fae5;
-        }
-
-        .stat-number {
-            display: block;
-            margin-top: 17px;
-            font-size: 31px;
-            font-weight: 750;
-        }
-
-        .stat-description {
-            margin-top: 5px;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        /* Complaint table */
-        .panel {
+        .card {
             background: white;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            border-radius: 12px;
+            padding: 23px;
+            box-shadow: 0 3px 14px #0f172a0d;
+            margin-bottom: 20px;
         }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 18px;
-            padding: 23px 24px;
-            border-bottom: 1px solid var(--border);
+        .card h2, .card h3 {
+            margin-bottom: 18px;
         }
 
-        .panel-header h2 {
-            margin: 0 0 6px;
-            font-size: 18px;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .panel-header p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 13px;
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
         }
 
-        .search {
-            width: 250px;
-            max-width: 100%;
-            padding: 11px 13px;
-            border: 1px solid #dce3ec;
-            border-radius: 9px;
-            outline: none;
-        }
-
-        .search:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px #0f766e18;
-        }
-
-        #message {
-            margin: 0;
-            padding: 12px 24px;
-            background: #f8fafc;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        #message.error {
-            color: #b91c1c;
-            background: #fef2f2;
-        }
-
-        #message.success {
-            color: #047857;
-            background: #ecfdf5;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        table {
+        input, select, textarea {
             width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            min-width: 1050px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
         }
 
-        th {
-            padding: 15px 17px;
-            background: #f8fafc;
-            color: #64748b;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            white-space: nowrap;
+        textarea {
+            min-height: 105px;
+            resize: vertical;
         }
 
-        td {
-            padding: 17px;
-            border-top: 1px solid #edf1f5;
-            font-size: 13px;
-            vertical-align: middle;
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
         }
 
-        tbody tr:hover {
-            background: #f8fcfb;
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .complaint-id {
-            color: var(--primary);
-            font-weight: 750;
-        }
-
-        .citizen-name {
-            font-weight: 650;
-        }
-
-        .description {
-            max-width: 220px;
+        .message {
+            display: none;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 7px;
             line-height: 1.5;
             overflow-wrap: anywhere;
         }
 
-        .status-select {
-            min-width: 125px;
-            padding: 8px 10px;
-            border: 1px solid #dce3ec;
-            border-radius: 8px;
-            background: white;
-            color: var(--text);
-            font-size: 12px;
-            font-weight: 650;
-            cursor: pointer;
-        }
-
-        .status-select:disabled {
-            cursor: wait;
-            opacity: 0.6;
-        }
-
-        .status-select.pending {
-            background: #fffbeb;
-            border-color: #fde68a;
-            color: #92400e;
-        }
-
-        .status-select.in-progress {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-            color: #1d4ed8;
-        }
-
-        .status-select.resolved {
-            background: #ecfdf5;
-            border-color: #a7f3d0;
-            color: #047857;
-        }
-
-        .priority {
-            display: inline-block;
-            padding: 6px 9px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .priority.high {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .priority.medium {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .priority.low {
+        .message.ok {
+            display: block;
             background: #dcfce7;
             color: #166534;
         }
 
-        .priority.unknown {
-            background: #f1f5f9;
+        .message.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .stat p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat h2 {
+            font-size: 28px;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 720px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 13px 11px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f8fafc;
             color: #475569;
         }
 
-        .empty-row {
-            padding: 35px;
-            text-align: center;
-            color: var(--muted);
-        }
-
-        .footer {
-            padding: 22px 0 5px;
-            color: var(--muted);
-            text-align: center;
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
             font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
-        @media (max-width: 1100px) {
-            .sidebar {
-                width: 200px;
-            }
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
-            .content {
-                padding: 24px 20px;
-            }
+        .in-progress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
 
-            .topbar {
-                padding: 20px;
+        .resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 750px) {
+            .grid {
+                grid-template-columns: 1fr;
             }
 
             .stats {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+
+            header h1 {
+                font-size: 19px;
+            }
+
+            .hero h2 {
+                font-size: 23px;
+            }
         }
 
-        @media (max-width: 700px) {
-            .sidebar {
-                display: none;
-            }
-
-            .topbar {
-                padding: 18px;
-            }
-
-            .topbar h1 {
-                font-size: 17px;
-            }
-
-            .content {
-                padding: 20px 14px;
-            }
-
-            .welcome {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .welcome h2 {
-                font-size: 21px;
-            }
-
+        @media (max-width: 400px) {
             .stats {
-                gap: 10px;
-            }
-
-            .stat-card {
-                padding: 15px;
-            }
-
-            .stat-number {
-                font-size: 26px;
-            }
-
-            .stat-label {
-                font-size: 12px;
-            }
-
-            .stat-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-            }
-
-            .panel-header {
-                align-items: flex-start;
-                flex-direction: column;
-                padding: 18px;
-            }
-
-            .search {
-                width: 100%;
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body>
-<div class="layout">
 
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">🏙️</div>
-            <div>
-                <h2>Smart City</h2>
-                <p>Complaint Portal</p>
-            </div>
-        </div>
-
-        <p class="nav-label">MAIN MENU</p>
-        <div class="nav-item active">▦ &nbsp; Dashboard</div>
-        <div class="nav-item">▤ &nbsp; All Complaints</div>
-        <div class="nav-item">◷ &nbsp; Status Tracking</div>
-
-        <div class="sidebar-note">
-            <strong>🏛️ Public Services</strong>
-            Helping citizens report civic issues and track complaint resolution.
-        </div>
-    </aside>
-
-    <div class="main">
-        <header class="topbar">
-            <div>
-                <small>SMART CITY / OVERVIEW</small>
-                <h1>Complaint Management Dashboard</h1>
-            </div>
-            <div class="admin-chip">● System Dashboard</div>
-        </header>
-
-        <main class="content">
-            <section class="welcome">
-                <div>
-                    <h2>Good day! 👋</h2>
-                    <p>Monitor civic complaints and track their resolution.</p>
-                </div>
-
-                <button class="button" id="refreshButton"
-                        onclick="loadComplaints()">
-                    ↻ &nbsp; Refresh Complaints
-                </button>
-            </section>
-
-            <section class="stats" aria-label="Complaint summary">
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-label">Total Complaints</span>
-                        <span class="stat-icon icon-total">📋</span>
-                    </div>
-                    <strong class="stat-number" id="total">0</strong>
-                    <div class="stat-description">All registered complaints</div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-label">Pending</span>
-                        <span class="stat-icon icon-pending">⏳</span>
-                    </div>
-                    <strong class="stat-number" id="pending">0</strong>
-                    <div class="stat-description">Awaiting action</div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-label">In Progress</span>
-                        <span class="stat-icon icon-progress">⚙️</span>
-                    </div>
-                    <strong class="stat-number" id="progress">0</strong>
-                    <div class="stat-description">Currently being handled</div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-label">Resolved</span>
-                        <span class="stat-icon icon-resolved">✅</span>
-                    </div>
-                    <strong class="stat-number" id="resolved">0</strong>
-                    <div class="stat-description">Successfully resolved</div>
-                </article>
-            </section>
-
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>All Complaints</h2>
-                        <p>Review complaint details and update their status.</p>
-                    </div>
-
-                    <input
-                        type="search"
-                        id="searchInput"
-                        class="search"
-                        placeholder="Search complaints..."
-                        aria-label="Search complaints"
-                    >
-                </div>
-
-                <p id="message" role="status" aria-live="polite">
-                    Loading complaints...
-                </p>
-
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Citizen</th>
-                                <th>Category</th>
-                                <th>Zone</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th>Priority</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="complaintTable"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <footer class="footer">
-                Smart City Complaint Management System · Public Complaint Portal
-            </footer>
-        </main>
+<header>
+    <div>
+        <h1>🏙️ Smart City Complaints</h1>
+        <p>Public Complaint Management System</p>
     </div>
-</div>
+
+    <div id="headerActions" class="hidden">
+        <span id="welcomeText"></span>
+        <button class="secondary" onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <h2>Make Your City Better</h2>
+        <p>
+            Report road damage, water leakage, garbage collection issues,
+            power failures and other civic problems. Submit complaints
+            and track their status online.
+        </p>
+    </section>
+
+    <div id="globalMessage" class="message"></div>
+
+    <!-- LOGIN AND REGISTRATION -->
+    <section id="authSection" class="grid">
+
+        <div class="card">
+            <h2>Login</h2>
+            <div id="loginMessage" class="message"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input id="loginUsername" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input id="loginPassword" type="password"
+                           required autocomplete="current-password">
+                </div>
+
+                <button class="primary" type="submit">Login</button>
+            </form>
+
+            <p class="small">
+                Use your registered account. Admin access depends on
+                the role assigned by your backend.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Create Account</h2>
+            <div id="registerMessage" class="message"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input id="registerUsername" required minlength="3"
+                           autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input id="registerPassword" type="password"
+                           required minlength="6"
+                           autocomplete="new-password">
+                </div>
+
+                <button class="success" type="submit">Register</button>
+            </form>
+
+            <p class="small">
+                Registration uses your existing backend authentication API.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- CITIZEN DASHBOARD -->
+    <section id="citizenSection" class="hidden">
+
+        <div class="card">
+            <h2>Citizen Dashboard</h2>
+            <p>Submit a new complaint using the form below.</p>
+        </div>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>📝 Submit a Complaint</h3>
+                <div id="complaintMessage" class="message"></div>
+
+                <form id="complaintForm">
+
+                    <div class="form-group">
+                        <label for="citizenId">Citizen ID</label>
+                        <input id="citizenId" type="number" min="1"
+                               required placeholder="Example: 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoryId">Complaint Category</label>
+                        <select id="categoryId" required>
+                            <option value="">Select category</option>
+                            <option value="1">Road Damage</option>
+                            <option value="2">Water Leakage</option>
+                            <option value="3">Garbage Collection</option>
+                            <option value="4">Power Failure</option>
+                            <option value="5">Streetlight Not Working</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="zoneId">City Zone</label>
+                        <select id="zoneId" required>
+                            <option value="">Select zone</option>
+                            <option value="1">Zone 1</option>
+                            <option value="2">Zone 2</option>
+                            <option value="3">Zone 3</option>
+                            <option value="4">Zone 4</option>
+                            <option value="5">Zone 5</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Complaint Description</label>
+                        <textarea id="description" required maxlength="2000"
+                                  placeholder="Describe the civic problem..."></textarea>
+                    </div>
+
+                    <button id="submitComplaintButton" class="primary"
+                            type="submit">Submit Complaint</button>
+                </form>
+
+                <p class="small">
+                    The Citizen ID must already exist in your MySQL Citizens table.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="section-heading">
+                    <h3>📍 Track Complaints</h3>
+                    <button class="secondary" onclick="loadCitizenComplaints()">
+                        Refresh
+                    </button>
+                </div>
+
+                <div id="trackingMessage" class="message"></div>
+
+                <div class="form-group">
+                    <label for="trackCitizenId">Citizen ID to track</label>
+                    <input id="trackCitizenId" type="number" min="1"
+                           placeholder="Enter Citizen ID">
+                </div>
+
+                <button class="primary" onclick="loadCitizenComplaints()">
+                    Track
+                </button>
+
+                <div id="citizenComplaints" style="margin-top:20px">
+                    <p class="small">Enter your Citizen ID to see complaints.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ADMIN DASHBOARD -->
+    <section id="adminSection" class="hidden">
+
+        <div class="card">
+            <div class="section-heading">
+                <div>
+                    <h2>Admin Dashboard</h2>
+                    <p>View complaints and update their status.</p>
+                </div>
+                <button class="primary" onclick="loadAdminComplaints()">
+                    Refresh Data
+                </button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <p>Total Complaints</p>
+                <h2 id="totalCount">0</h2>
+            </div>
+            <div class="stat">
+                <p>Pending</p>
+                <h2 id="pendingCount">0</h2>
+            </div>
+            <div class="stat">
+                <p>In Progress</p>
+                <h2 id="progressCount">0</h2>
+            </div>
+            <div class="stat">
+                <p>Resolved</p>
+                <h2 id="resolvedCount">0</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div id="adminMessage" class="message"></div>
+
+            <div class="section-heading">
+                <h3>All Complaints</h3>
+                <select id="statusFilter" style="max-width:200px"
+                        onchange="renderAdminComplaints()">
+                    <option value="All">All statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Citizen</th>
+                            <th>Category</th>
+                            <th>Zone</th>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <tr><td colspan="8">Load complaints to begin.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    Smart City Complaint Management System | College DBMS Project
+</footer>
 
 <script>
+    const API = "/api";
+
+    let currentUser = null;
     let allComplaints = [];
 
-    const allowedStatuses = ["Pending", "In Progress", "Resolved"];
+    const $ = id => document.getElementById(id);
 
-    function setMessage(text, type = "") {
-        const message = document.getElementById("message");
-        message.textContent = text;
-        message.className = type;
+    function showMessage(id, message, type = "ok") {
+        const element = $(id);
+        element.textContent = message;
+        element.className = "message " + type;
+    }
+
+    function clearMessage(id) {
+        const element = $(id);
+        element.textContent = "";
+        element.className = "message";
+    }
+
+    async function request(url, options = {}) {
+        const response = await fetch(API + url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+
+        const raw = await response.text();
+        let data = {};
+
+        if (raw) {
+            try {
+                data = JSON.parse(raw);
+            } catch {
+                data = { message: raw };
+            }
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.message ||
+                data.detail ||
+                data.error ||
+                data.title ||
+                ("Request failed with HTTP " + response.status)
+            );
+        }
+
+        return data;
+    }
+
+    function showDashboard() {
+        $("authSection").classList.add("hidden");
+        $("headerActions").classList.remove("hidden");
+        $("welcomeText").textContent =
+            "Welcome, " + currentUser.username;
+
+        $("citizenSection").classList.add("hidden");
+        $("adminSection").classList.add("hidden");
+
+        if (String(currentUser.role || "").toUpperCase() === "ADMIN") {
+            $("adminSection").classList.remove("hidden");
+            loadAdminComplaints();
+        } else {
+            $("citizenSection").classList.remove("hidden");
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        allComplaints = [];
+
+        $("authSection").classList.remove("hidden");
+        $("citizenSection").classList.add("hidden");
+        $("adminSection").classList.add("hidden");
+        $("headerActions").classList.add("hidden");
+
+        $("loginForm").reset();
+        $("registerForm").reset();
+        $("complaintForm").reset();
+
+        clearMessage("globalMessage");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // REGISTER
+    $("registerForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        clearMessage("registerMessage");
+
+        const username = $("registerUsername").value.trim();
+        const password = $("registerPassword").value;
+
+        try {
+            const result = await request("/auth/register", {
+                method: "POST",
+                body: JSON.stringify({ username, password })
+            });
+
+            showMessage(
+                "registerMessage",
+                result.message || "Registration successful. Please log in."
+            );
+
+            $("registerForm").reset();
+        } catch (error) {
+            showMessage("registerMessage", error.message, "error");
+        }
+    });
+
+    // LOGIN
+    $("loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        clearMessage("loginMessage");
+
+        const username = $("loginUsername").value.trim();
+        const password = $("loginPassword").value;
+
+        try {
+            const result = await request("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({ username, password })
+            });
+
+            // Supports a response containing user details directly
+            // or nested under a "user" property.
+            const user = result.user || result;
+
+            if (!user.username) {
+                user.username = username;
+            }
+
+            if (!user.role) {
+                user.role = "CITIZEN";
+            }
+
+            currentUser = user;
+
+            showDashboard();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+        } catch (error) {
+            showMessage("loginMessage", error.message, "error");
+        }
+    });
+
+    // SUBMIT COMPLAINT
+    $("complaintForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        clearMessage("complaintMessage");
+
+        const citizenId = Number($("citizenId").value);
+        const categoryId = Number($("categoryId").value);
+        const zoneId = Number($("zoneId").value);
+        const description = $("description").value.trim();
+        const priority = $("priority").value;
+
+        if (!Number.isInteger(citizenId) || citizenId < 1 ||
+            !Number.isInteger(categoryId) || categoryId < 1 ||
+            !Number.isInteger(zoneId) || zoneId < 1) {
+            showMessage(
+                "complaintMessage",
+                "Enter valid Citizen, Category and Zone IDs.",
+                "error"
+            );
+            return;
+        }
+
+        if (!description) {
+            showMessage(
+                "complaintMessage",
+                "Please enter a complaint description.",
+                "error"
+            );
+            return;
+        }
+
+        const button = $("submitComplaintButton");
+        button.disabled = true;
+        button.textContent = "Submitting...";
+
+        try {
+            const result = await request("/complaints", {
+                method: "POST",
+                body: JSON.stringify({
+                    citizen_id: citizenId,
+                    citizen_name: currentUser.username,
+                    category_id: categoryId,
+                    zone_id: zoneId,
+                    description: description,
+                    priority: priority
+                })
+            });
+
+            showMessage(
+                "complaintMessage",
+                (result.message || "Complaint submitted successfully.") +
+                (result.complaint_id
+                    ? " Complaint ID: " + result.complaint_id
+                    : "")
+            );
+
+            $("complaintForm").reset();
+            $("trackCitizenId").value = citizenId;
+
+            await loadCitizenComplaints();
+
+        } catch (error) {
+            showMessage("complaintMessage", error.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "Submit Complaint";
+        }
+    });
+
+    async function getComplaints() {
+        const result = await request("/complaints");
+
+        if (!Array.isArray(result)) {
+            throw new Error("The complaints API did not return a list.");
+        }
+
+        return result;
     }
 
     function statusClass(status) {
-        if (status === "Pending") return "pending";
-        if (status === "In Progress") return "in-progress";
         if (status === "Resolved") return "resolved";
-        return "";
+        if (status === "In Progress") return "in-progress";
+        return "pending";
     }
 
-    function priorityClass(priority) {
-        const value = String(priority ?? "").toLowerCase();
-
-        if (value === "high") return "high";
-        if (value === "medium") return "medium";
-        if (value === "low") return "low";
-
-        return "unknown";
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
     }
 
-    function addCell(row, value, className = "") {
-        const cell = document.createElement("td");
-        cell.textContent = value ?? "-";
+    // CITIZEN TRACKING
+    async function loadCitizenComplaints() {
+        clearMessage("trackingMessage");
 
-        if (className) {
-            cell.className = className;
+        const input = $("trackCitizenId").value ||
+                      $("citizenId").value;
+
+        const citizenId = Number(input);
+
+        if (!Number.isInteger(citizenId) || citizenId < 1) {
+            showMessage(
+                "trackingMessage",
+                "Enter a valid Citizen ID.",
+                "error"
+            );
+            return;
         }
 
-        row.appendChild(cell);
-        return cell;
+        $("trackCitizenId").value = citizenId;
+        $("citizenComplaints").textContent = "Loading complaints...";
+
+        try {
+            const complaints = await getComplaints();
+
+            const filtered = complaints.filter(
+                complaint => Number(complaint.citizen_id) === citizenId
+            );
+
+            const container = $("citizenComplaints");
+            container.replaceChildren();
+
+            if (filtered.length === 0) {
+                const p = document.createElement("p");
+                p.className = "small";
+                p.textContent = "No complaints found for Citizen ID " +
+                                citizenId + ".";
+                container.appendChild(p);
+                return;
+            }
+
+            filtered.forEach(complaint => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.style.borderLeft = "4px solid #2563eb";
+
+                const title = document.createElement("h3");
+                title.textContent = "Complaint #" + complaint.complaint_id;
+
+                const category = document.createElement("p");
+                category.textContent =
+                    "Category: " + (complaint.category_name || "Unknown");
+
+                const zone = document.createElement("p");
+                zone.textContent =
+                    "Zone: " + (complaint.zone_name || "Unknown");
+
+                const description = document.createElement("p");
+                description.style.margin = "12px 0";
+                description.textContent =
+                    complaint.description || "No description";
+
+                const status = document.createElement("span");
+                status.className =
+                    "status " + statusClass(complaint.status);
+                status.textContent = complaint.status || "Pending";
+
+                card.append(title, category, zone, description, status);
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            $("citizenComplaints").textContent = "";
+            showMessage("trackingMessage", error.message, "error");
+        }
     }
 
-    function updateSummary() {
-        const pending = allComplaints.filter(
-            complaint => complaint.status === "Pending"
-        ).length;
+    // ADMIN DASHBOARD
+    async function loadAdminComplaints() {
+        clearMessage("adminMessage");
+        $("adminTableBody").innerHTML =
+            '<tr><td colspan="8">Loading complaints...</td></tr>';
 
-        const progress = allComplaints.filter(
-            complaint => complaint.status === "In Progress"
-        ).length;
+        try {
+            allComplaints = await getComplaints();
 
-        const resolved = allComplaints.filter(
-            complaint => complaint.status === "Resolved"
-        ).length;
+            $("totalCount").textContent = allComplaints.length;
+            $("pendingCount").textContent = allComplaints.filter(
+                c => c.status === "Pending"
+            ).length;
+            $("progressCount").textContent = allComplaints.filter(
+                c => c.status === "In Progress"
+            ).length;
+            $("resolvedCount").textContent = allComplaints.filter(
+                c => c.status === "Resolved"
+            ).length;
 
-        document.getElementById("total").textContent =
-            allComplaints.length;
+            renderAdminComplaints();
 
-        document.getElementById("pending").textContent = pending;
-        document.getElementById("progress").textContent = progress;
-        document.getElementById("resolved").textContent = resolved;
+        } catch (error) {
+            $("adminTableBody").innerHTML = "";
+            showMessage("adminMessage", error.message, "error");
+        }
     }
 
-    function renderComplaints() {
-        const table = document.getElementById("complaintTable");
-        const searchTerm = document.getElementById("searchInput")
-            .value.trim().toLowerCase();
+    function renderAdminComplaints() {
+        const tbody = $("adminTableBody");
+        tbody.replaceChildren();
 
-        table.replaceChildren();
+        const filter = $("statusFilter").value;
 
-        const filtered = allComplaints.filter(complaint => {
-            const searchable = [
-                complaint.complaint_id,
-                complaint.citizen_name,
-                complaint.category_name,
-                complaint.zone_name,
-                complaint.description,
-                complaint.status,
-                complaint.priority
-            ].join(" ").toLowerCase();
-
-            return searchable.includes(searchTerm);
-        });
+        const filtered = allComplaints.filter(complaint =>
+            filter === "All" || complaint.status === filter
+        );
 
         if (filtered.length === 0) {
-            const row = document.createElement("tr");
-            const cell = document.createElement("td");
-
+            const row = tbody.insertRow();
+            const cell = row.insertCell();
             cell.colSpan = 8;
-            cell.className = "empty-row";
-            cell.textContent = allComplaints.length === 0
-                ? "No complaints found."
-                : "No complaints match your search.";
-
-            row.appendChild(cell);
-            table.appendChild(row);
+            cell.textContent = "No complaints found.";
             return;
         }
 
         filtered.forEach(complaint => {
-            const row = document.createElement("tr");
+            const row = tbody.insertRow();
 
-            addCell(row, "#" + complaint.complaint_id, "complaint-id");
-            addCell(row, complaint.citizen_name ?? "-", "citizen-name");
-            addCell(row, complaint.category_name);
-            addCell(row, complaint.zone_name);
-            addCell(row, complaint.description, "description");
+            const values = [
+                complaint.complaint_id,
+                complaint.citizen_name || "Unknown",
+                complaint.category_name || "Unknown",
+                complaint.zone_name || "Unknown",
+                complaint.description || "",
+                complaint.priority || "",
+                complaint.status || "Pending"
+            ];
 
-            const statusCell = document.createElement("td");
-            const statusSelect = document.createElement("select");
+            values.forEach((value, index) => {
+                const cell = row.insertCell();
 
-            statusSelect.className =
-                "status-select " + statusClass(complaint.status);
-
-            statusSelect.setAttribute(
-                "aria-label",
-                "Status for complaint " + complaint.complaint_id
-            );
-
-            allowedStatuses.forEach(status => {
-                const option = document.createElement("option");
-                option.value = status;
-                option.textContent = status;
-                option.selected = status === complaint.status;
-                statusSelect.appendChild(option);
-            });
-
-            statusSelect.addEventListener("change", async () => {
-                const newStatus = statusSelect.value;
-                const oldStatus = complaint.status;
-
-                if (newStatus === oldStatus) return;
-
-                statusSelect.disabled = true;
-                setMessage(
-                    "Updating complaint #" + complaint.complaint_id + "..."
-                );
-
-                try {
-                    const response = await fetch(
-                        "/api/complaints/" +
-                        encodeURIComponent(complaint.complaint_id) +
-                        "/status",
-                        {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ status: newStatus })
-                        }
-                    );
-
-                    if (!response.ok) {
-                        let errorMessage = "Status update failed.";
-
-                        try {
-                            const data = await response.json();
-                            errorMessage =
-                                data.detail ||
-                                data.message ||
-                                data.error ||
-                                errorMessage;
-                        } catch (ignored) {
-                            // Use the default error message.
-                        }
-
-                        throw new Error(errorMessage);
-                    }
-
-                    // Refresh from the server so counts and status stay accurate.
-                    await loadComplaints(
-                        "Complaint #" + complaint.complaint_id +
-                        " updated successfully."
-                    );
-
-                } catch (error) {
-                    setMessage(
-                        "Could not update status: " + error.message,
-                        "error"
-                    );
-
-                    // Reload saved values after a failed update.
-                    await loadComplaints(null, true);
+                if (index === 6) {
+                    const badge = document.createElement("span");
+                    badge.className =
+                        "status " + statusClass(String(value));
+                    badge.textContent = value;
+                    cell.appendChild(badge);
+                } else {
+                    cell.textContent = value;
                 }
             });
 
-            statusCell.appendChild(statusSelect);
-            row.appendChild(statusCell);
+            const updateCell = row.insertCell();
+            const select = document.createElement("select");
 
-            const priorityCell = document.createElement("td");
-            const priorityBadge = document.createElement("span");
+            ["Pending", "In Progress", "Resolved"].forEach(status => {
+                const option = document.createElement("option");
+                option.value = status;
+                option.textContent = status;
+                select.appendChild(option);
+            });
 
-            priorityBadge.className =
-                "priority " + priorityClass(complaint.priority);
+            select.value = complaint.status || "Pending";
 
-            priorityBadge.textContent = complaint.priority ?? "-";
-            priorityCell.appendChild(priorityBadge);
-            row.appendChild(priorityCell);
+            const button = document.createElement("button");
+            button.className = "primary";
+            button.textContent = "Save";
+            button.style.marginTop = "8px";
 
-            addCell(row, complaint.complaint_date ?? "-");
+            button.addEventListener("click", () =>
+                updateStatus(complaint.complaint_id, select.value, button)
+            );
 
-            table.appendChild(row);
+            updateCell.append(select, button);
         });
     }
 
-    async function loadComplaints(successMessage = null, keepError = false) {
-        const refreshButton = document.getElementById("refreshButton");
-
-        refreshButton.disabled = true;
-
-        if (!keepError) {
-            setMessage("Loading complaints...");
-        }
+    async function updateStatus(id, status, button) {
+        clearMessage("adminMessage");
+        button.disabled = true;
+        button.textContent = "Saving...";
 
         try {
-            const response = await fetch("/api/complaints");
-
-            if (!response.ok) {
-                throw new Error("Could not load complaints.");
-            }
-
-            const complaints = await response.json();
-
-            if (!Array.isArray(complaints)) {
-                throw new Error("Invalid complaint data received.");
-            }
-
-            allComplaints = complaints;
-            updateSummary();
-            renderComplaints();
-
-            if (successMessage) {
-                setMessage(successMessage, "success");
-            } else if (!keepError) {
-                setMessage(
-                    allComplaints.length === 0
-                        ? "No complaints found."
-                        : "Complaints loaded successfully.",
-                    "success"
-                );
-            }
-
-        } catch (error) {
-            setMessage(
-                "Unable to load complaints. " + error.message,
-                "error"
+            const result = await request(
+                "/complaints/" + encodeURIComponent(id) + "/status",
+                {
+                    method: "PUT",
+                    body: JSON.stringify({ status })
+                }
             );
 
-            console.error("Error loading complaints:", error);
+            showMessage(
+                "adminMessage",
+                result.message || "Complaint status updated."
+            );
 
+            await loadAdminComplaints();
+
+        } catch (error) {
+            showMessage("adminMessage", error.message, "error");
         } finally {
-            refreshButton.disabled = false;
+            button.disabled = false;
+            button.textContent = "Save";
         }
     }
-
-    document.getElementById("searchInput").addEventListener(
-        "input",
-        renderComplaints
-    );
-
-    window.addEventListener("DOMContentLoaded", () => {
-        loadComplaints();
-    });
 </script>
+
 </body>
 </html>
