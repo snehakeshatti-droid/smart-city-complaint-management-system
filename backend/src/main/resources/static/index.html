@@ -4,349 +4,923 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart City Complaint Management</title>
+    <title>Smart City | Complaint Management</title>
 
     <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --background: #f4f7fb;
+            --white: #ffffff;
+            --text: #172b4d;
+            --muted: #64748b;
+            --border: #e5eaf1;
+            --shadow: 0 5px 22px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            background: #f1f5f9;
-            color: #1e293b;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
         }
 
-        header {
-            background: #0f766e;
+        button, input, select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            background: #103b3b;
             color: white;
-            padding: 25px;
-            text-align: center;
+            padding: 28px 18px;
         }
 
-        main {
-            max-width: 1300px;
-            margin: 30px auto;
-            padding: 20px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 30px;
+            border-bottom: 1px solid #ffffff24;
         }
 
-        .summary {
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            background: #14b8a6;
+            border-radius: 13px;
+            font-size: 23px;
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #b9d9d6;
+            font-size: 12px;
+        }
+
+        .nav-label {
+            margin: 30px 10px 12px;
+            color: #a6c7c4;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-item {
+            padding: 13px 12px;
+            margin: 7px 0;
+            border-radius: 9px;
+            color: #d8e9e7;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            background: #176b65;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-note {
+            margin-top: 45px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #ffffff10;
+            color: #d8e9e7;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .sidebar-note strong {
+            display: block;
+            color: white;
+            font-size: 13px;
+        }
+
+        /* Main area */
+        .main {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 34px;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px #00000010;
+            border-bottom: 1px solid var(--border);
         }
 
-        .summary h2 {
-            margin-top: 0;
+        .topbar small {
+            color: var(--muted);
         }
 
-        .table-container {
+        .topbar h1 {
+            margin: 5px 0 0;
+            font-size: 21px;
+        }
+
+        .admin-chip {
+            padding: 10px 14px;
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            border-radius: 30px;
+            color: #047857;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .content {
+            max-width: 1500px;
+            margin: auto;
+            padding: 30px 34px;
+        }
+
+        .welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            margin: 0 0 8px;
+            font-size: 24px;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .button {
+            border: 0;
+            border-radius: 9px;
+            padding: 12px 16px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .button:hover {
+            background: var(--primary-dark);
+        }
+
+        .button:disabled {
+            cursor: wait;
+            opacity: 0.6;
+        }
+
+        /* Summary cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 20px;
+        }
+
+        .icon-total {
+            background: #e0f2fe;
+        }
+
+        .icon-pending {
+            background: #fef3c7;
+        }
+
+        .icon-progress {
+            background: #dbeafe;
+        }
+
+        .icon-resolved {
+            background: #d1fae5;
+        }
+
+        .stat-number {
+            display: block;
+            margin-top: 17px;
+            font-size: 31px;
+            font-weight: 750;
+        }
+
+        .stat-description {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* Complaint table */
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 23px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-header h2 {
+            margin: 0 0 6px;
+            font-size: 18px;
+        }
+
+        .panel-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search {
+            width: 250px;
+            max-width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #dce3ec;
+            border-radius: 9px;
+            outline: none;
+        }
+
+        .search:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px #0f766e18;
+        }
+
+        #message {
+            margin: 0;
+            padding: 12px 24px;
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        #message.error {
+            color: #b91c1c;
+            background: #fef2f2;
+        }
+
+        #message.success {
+            color: #047857;
+            background: #ecfdf5;
+        }
+
+        .table-wrap {
             overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 950px;
-        }
-
-        th, td {
-            padding: 13px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            min-width: 1050px;
         }
 
         th {
-            background: #e2e8f0;
+            padding: 15px 17px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
         }
 
-        .status {
-            font-weight: bold;
+        td {
+            padding: 17px;
+            border-top: 1px solid #edf1f5;
+            font-size: 13px;
+            vertical-align: middle;
         }
 
-        select {
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
+        tbody tr:hover {
+            background: #f8fcfb;
+        }
+
+        .complaint-id {
+            color: var(--primary);
+            font-weight: 750;
+        }
+
+        .citizen-name {
+            font-weight: 650;
+        }
+
+        .description {
+            max-width: 220px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .status-select {
+            min-width: 125px;
+            padding: 8px 10px;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
             background: white;
-            color: #1e293b;
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 650;
             cursor: pointer;
         }
 
-        select:disabled {
+        .status-select:disabled {
             cursor: wait;
             opacity: 0.6;
         }
 
-        button {
-            background: #0f766e;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 5px;
-            cursor: pointer;
+        .status-select.pending {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
         }
 
-        button:hover {
-            background: #115e59;
+        .status-select.in-progress {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
         }
 
-        #message {
-            margin: 15px 0;
+        .status-select.resolved {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #047857;
         }
 
-        .counts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
+        .priority {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .priority.high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .priority.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .priority.unknown {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .empty-row {
+            padding: 35px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .footer {
+            padding: 22px 0 5px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .content {
+                padding: 24px 20px;
+            }
+
+            .topbar {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+
+            .topbar {
+                padding: 18px;
+            }
+
+            .topbar h1 {
+                font-size: 17px;
+            }
+
+            .content {
+                padding: 20px 14px;
+            }
+
+            .welcome {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .welcome h2 {
+                font-size: 21px;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 26px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .panel-header {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 18px;
+            }
+
+            .search {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
+<div class="layout">
 
-    <header>
-        <h1>Smart City Complaint Management System</h1>
-        <p>Public Complaint Dashboard</p>
-    </header>
-
-    <main>
-
-        <section class="summary">
-            <h2>Complaint Overview</h2>
-
-            <div class="counts">
-                <p>Total Complaints: <strong id="total">0</strong></p>
-                <p>Pending: <strong id="pending">0</strong></p>
-                <p>In Progress: <strong id="progress">0</strong></p>
-                <p>Resolved: <strong id="resolved">0</strong></p>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏙️</div>
+            <div>
+                <h2>Smart City</h2>
+                <p>Complaint Portal</p>
             </div>
+        </div>
 
-            <button id="refreshButton" onclick="loadComplaints()">
-                Refresh Complaints
-            </button>
-        </section>
+        <p class="nav-label">MAIN MENU</p>
+        <div class="nav-item active">▦ &nbsp; Dashboard</div>
+        <div class="nav-item">▤ &nbsp; All Complaints</div>
+        <div class="nav-item">◷ &nbsp; Status Tracking</div>
 
-        <section class="table-container">
-            <h2>All Complaints</h2>
+        <div class="sidebar-note">
+            <strong>🏛️ Public Services</strong>
+            Helping citizens report civic issues and track complaint resolution.
+        </div>
+    </aside>
 
-            <p id="message" role="status" aria-live="polite">
-                Loading complaints...
-            </p>
+    <div class="main">
+        <header class="topbar">
+            <div>
+                <small>SMART CITY / OVERVIEW</small>
+                <h1>Complaint Management Dashboard</h1>
+            </div>
+            <div class="admin-chip">● System Dashboard</div>
+        </header>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Citizen</th>
-                        <th>Category</th>
-                        <th>Zone</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
+        <main class="content">
+            <section class="welcome">
+                <div>
+                    <h2>Good day! 👋</h2>
+                    <p>Monitor civic complaints and track their resolution.</p>
+                </div>
 
-                <tbody id="complaintTable"></tbody>
-            </table>
-        </section>
+                <button class="button" id="refreshButton"
+                        onclick="loadComplaints()">
+                    ↻ &nbsp; Refresh Complaints
+                </button>
+            </section>
 
-    </main>
+            <section class="stats" aria-label="Complaint summary">
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Complaints</span>
+                        <span class="stat-icon icon-total">📋</span>
+                    </div>
+                    <strong class="stat-number" id="total">0</strong>
+                    <div class="stat-description">All registered complaints</div>
+                </article>
 
-    <script>
-        async function loadComplaints() {
-            const message = document.getElementById("message");
-            const table = document.getElementById("complaintTable");
-            const refreshButton = document.getElementById("refreshButton");
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Pending</span>
+                        <span class="stat-icon icon-pending">⏳</span>
+                    </div>
+                    <strong class="stat-number" id="pending">0</strong>
+                    <div class="stat-description">Awaiting action</div>
+                </article>
 
-            message.textContent = "Loading complaints...";
-            table.replaceChildren();
-            refreshButton.disabled = true;
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">In Progress</span>
+                        <span class="stat-icon icon-progress">⚙️</span>
+                    </div>
+                    <strong class="stat-number" id="progress">0</strong>
+                    <div class="stat-description">Currently being handled</div>
+                </article>
 
-            try {
-                const response = await fetch("/api/complaints");
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Resolved</span>
+                        <span class="stat-icon icon-resolved">✅</span>
+                    </div>
+                    <strong class="stat-number" id="resolved">0</strong>
+                    <div class="stat-description">Successfully resolved</div>
+                </article>
+            </section>
 
-                if (!response.ok) {
-                    throw new Error("Could not load complaints.");
-                }
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>All Complaints</h2>
+                        <p>Review complaint details and update their status.</p>
+                    </div>
 
-                const complaints = await response.json();
+                    <input
+                        type="search"
+                        id="searchInput"
+                        class="search"
+                        placeholder="Search complaints..."
+                        aria-label="Search complaints"
+                    >
+                </div>
 
-                if (!Array.isArray(complaints)) {
-                    throw new Error("Invalid complaint data received.");
-                }
+                <p id="message" role="status" aria-live="polite">
+                    Loading complaints...
+                </p>
 
-                let pending = 0;
-                let progress = 0;
-                let resolved = 0;
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Citizen</th>
+                                <th>Category</th>
+                                <th>Zone</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complaintTable"></tbody>
+                    </table>
+                </div>
+            </section>
 
-                complaints.forEach(function (complaint) {
+            <footer class="footer">
+                Smart City Complaint Management System · Public Complaint Portal
+            </footer>
+        </main>
+    </div>
+</div>
 
-                    // Count complaints by status
-                    if (complaint.status === "Pending") {
-                        pending++;
-                    } else if (complaint.status === "In Progress") {
-                        progress++;
-                    } else if (complaint.status === "Resolved") {
-                        resolved++;
-                    }
+<script>
+    let allComplaints = [];
 
-                    const row = document.createElement("tr");
+    const allowedStatuses = ["Pending", "In Progress", "Resolved"];
 
-                    // Complaint details before status
-                    const values = [
-                        complaint.complaint_id,
-                        complaint.citizen_name,
-                        complaint.category_name,
-                        complaint.zone_name,
-                        complaint.description
-                    ];
+    function setMessage(text, type = "") {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className = type;
+    }
 
-                    values.forEach(function (value) {
-                        const cell = document.createElement("td");
-                        cell.textContent = value ?? "-";
-                        row.appendChild(cell);
-                    });
+    function statusClass(status) {
+        if (status === "Pending") return "pending";
+        if (status === "In Progress") return "in-progress";
+        if (status === "Resolved") return "resolved";
+        return "";
+    }
 
-                    // Status dropdown
-                    const statusCell = document.createElement("td");
-                    statusCell.className = "status";
+    function priorityClass(priority) {
+        const value = String(priority ?? "").toLowerCase();
 
-                    const statusSelect = document.createElement("select");
-                    statusSelect.setAttribute(
-                        "aria-label",
-                        "Status for complaint " + complaint.complaint_id
-                    );
+        if (value === "high") return "high";
+        if (value === "medium") return "medium";
+        if (value === "low") return "low";
 
-                    const allowedStatuses = [
-                        "Pending",
-                        "In Progress",
-                        "Resolved"
-                    ];
+        return "unknown";
+    }
 
-                    allowedStatuses.forEach(function (status) {
-                        const option = document.createElement("option");
-                        option.value = status;
-                        option.textContent = status;
+    function addCell(row, value, className = "") {
+        const cell = document.createElement("td");
+        cell.textContent = value ?? "-";
 
-                        if (status === complaint.status) {
-                            option.selected = true;
-                        }
-
-                        statusSelect.appendChild(option);
-                    });
-
-                    statusSelect.addEventListener("change", async function () {
-                        const newStatus = statusSelect.value;
-
-                        statusSelect.disabled = true;
-                        message.textContent =
-                            "Updating complaint #" +
-                            complaint.complaint_id + "...";
-
-                        try {
-                            const updateResponse = await fetch(
-                                "/api/complaints/" +
-                                complaint.complaint_id + "/status",
-                                {
-                                    method: "PUT",
-                                    headers: {
-                                        "Content-Type": "application/json"
-                                    },
-                                    body: JSON.stringify({
-                                        status: newStatus
-                                    })
-                                }
-                            );
-
-                            if (!updateResponse.ok) {
-                                let errorMessage = "Status update failed.";
-
-                                try {
-                                    const errorData =
-                                        await updateResponse.json();
-
-                                    errorMessage =
-                                        errorData.detail ||
-                                        errorData.message ||
-                                        errorData.error ||
-                                        errorMessage;
-                                } catch (ignored) {
-                                    // Keep the default error message.
-                                }
-
-                                throw new Error(errorMessage);
-                            }
-
-                            message.textContent =
-                                "Complaint #" +
-                                complaint.complaint_id +
-                                " updated successfully.";
-
-                            // Reload table and summary counts
-                            await loadComplaints();
-
-                        } catch (error) {
-                            message.textContent =
-                                "Could not update status: " + error.message;
-
-                            // Restore the saved status from the server
-                            await loadComplaints();
-
-                        } finally {
-                            statusSelect.disabled = false;
-                        }
-                    });
-
-                    statusCell.appendChild(statusSelect);
-                    row.appendChild(statusCell);
-
-                    // Priority
-                    const priorityCell = document.createElement("td");
-                    priorityCell.textContent = complaint.priority ?? "-";
-                    row.appendChild(priorityCell);
-
-                    // Complaint date
-                    const dateCell = document.createElement("td");
-                    dateCell.textContent = complaint.complaint_date ?? "-";
-                    row.appendChild(dateCell);
-
-                    table.appendChild(row);
-                });
-
-                // Update dashboard totals
-                document.getElementById("total").textContent =
-                    complaints.length;
-
-                document.getElementById("pending").textContent = pending;
-                document.getElementById("progress").textContent = progress;
-                document.getElementById("resolved").textContent = resolved;
-
-                if (complaints.length === 0) {
-                    message.textContent = "No complaints found.";
-                } else if (message.textContent === "Loading complaints...") {
-                    message.textContent = "Complaints loaded successfully.";
-                } else if (!message.textContent.startsWith("Complaint #")) {
-                    message.textContent = "Complaints loaded successfully.";
-                }
-
-            } catch (error) {
-                message.textContent =
-                    "Unable to load complaints. " + error.message;
-
-                console.error("Error loading complaints:", error);
-
-            } finally {
-                refreshButton.disabled = false;
-            }
+        if (className) {
+            cell.className = className;
         }
 
-        // Load complaints when the page opens
-        window.addEventListener("DOMContentLoaded", loadComplaints);
-    </script>
+        row.appendChild(cell);
+        return cell;
+    }
 
+    function updateSummary() {
+        const pending = allComplaints.filter(
+            complaint => complaint.status === "Pending"
+        ).length;
+
+        const progress = allComplaints.filter(
+            complaint => complaint.status === "In Progress"
+        ).length;
+
+        const resolved = allComplaints.filter(
+            complaint => complaint.status === "Resolved"
+        ).length;
+
+        document.getElementById("total").textContent =
+            allComplaints.length;
+
+        document.getElementById("pending").textContent = pending;
+        document.getElementById("progress").textContent = progress;
+        document.getElementById("resolved").textContent = resolved;
+    }
+
+    function renderComplaints() {
+        const table = document.getElementById("complaintTable");
+        const searchTerm = document.getElementById("searchInput")
+            .value.trim().toLowerCase();
+
+        table.replaceChildren();
+
+        const filtered = allComplaints.filter(complaint => {
+            const searchable = [
+                complaint.complaint_id,
+                complaint.citizen_name,
+                complaint.category_name,
+                complaint.zone_name,
+                complaint.description,
+                complaint.status,
+                complaint.priority
+            ].join(" ").toLowerCase();
+
+            return searchable.includes(searchTerm);
+        });
+
+        if (filtered.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 8;
+            cell.className = "empty-row";
+            cell.textContent = allComplaints.length === 0
+                ? "No complaints found."
+                : "No complaints match your search.";
+
+            row.appendChild(cell);
+            table.appendChild(row);
+            return;
+        }
+
+        filtered.forEach(complaint => {
+            const row = document.createElement("tr");
+
+            addCell(row, "#" + complaint.complaint_id, "complaint-id");
+            addCell(row, complaint.citizen_name ?? "-", "citizen-name");
+            addCell(row, complaint.category_name);
+            addCell(row, complaint.zone_name);
+            addCell(row, complaint.description, "description");
+
+            const statusCell = document.createElement("td");
+            const statusSelect = document.createElement("select");
+
+            statusSelect.className =
+                "status-select " + statusClass(complaint.status);
+
+            statusSelect.setAttribute(
+                "aria-label",
+                "Status for complaint " + complaint.complaint_id
+            );
+
+            allowedStatuses.forEach(status => {
+                const option = document.createElement("option");
+                option.value = status;
+                option.textContent = status;
+                option.selected = status === complaint.status;
+                statusSelect.appendChild(option);
+            });
+
+            statusSelect.addEventListener("change", async () => {
+                const newStatus = statusSelect.value;
+                const oldStatus = complaint.status;
+
+                if (newStatus === oldStatus) return;
+
+                statusSelect.disabled = true;
+                setMessage(
+                    "Updating complaint #" + complaint.complaint_id + "..."
+                );
+
+                try {
+                    const response = await fetch(
+                        "/api/complaints/" +
+                        encodeURIComponent(complaint.complaint_id) +
+                        "/status",
+                        {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ status: newStatus })
+                        }
+                    );
+
+                    if (!response.ok) {
+                        let errorMessage = "Status update failed.";
+
+                        try {
+                            const data = await response.json();
+                            errorMessage =
+                                data.detail ||
+                                data.message ||
+                                data.error ||
+                                errorMessage;
+                        } catch (ignored) {
+                            // Use the default error message.
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+
+                    // Refresh from the server so counts and status stay accurate.
+                    await loadComplaints(
+                        "Complaint #" + complaint.complaint_id +
+                        " updated successfully."
+                    );
+
+                } catch (error) {
+                    setMessage(
+                        "Could not update status: " + error.message,
+                        "error"
+                    );
+
+                    // Reload saved values after a failed update.
+                    await loadComplaints(null, true);
+                }
+            });
+
+            statusCell.appendChild(statusSelect);
+            row.appendChild(statusCell);
+
+            const priorityCell = document.createElement("td");
+            const priorityBadge = document.createElement("span");
+
+            priorityBadge.className =
+                "priority " + priorityClass(complaint.priority);
+
+            priorityBadge.textContent = complaint.priority ?? "-";
+            priorityCell.appendChild(priorityBadge);
+            row.appendChild(priorityCell);
+
+            addCell(row, complaint.complaint_date ?? "-");
+
+            table.appendChild(row);
+        });
+    }
+
+    async function loadComplaints(successMessage = null, keepError = false) {
+        const refreshButton = document.getElementById("refreshButton");
+
+        refreshButton.disabled = true;
+
+        if (!keepError) {
+            setMessage("Loading complaints...");
+        }
+
+        try {
+            const response = await fetch("/api/complaints");
+
+            if (!response.ok) {
+                throw new Error("Could not load complaints.");
+            }
+
+            const complaints = await response.json();
+
+            if (!Array.isArray(complaints)) {
+                throw new Error("Invalid complaint data received.");
+            }
+
+            allComplaints = complaints;
+            updateSummary();
+            renderComplaints();
+
+            if (successMessage) {
+                setMessage(successMessage, "success");
+            } else if (!keepError) {
+                setMessage(
+                    allComplaints.length === 0
+                        ? "No complaints found."
+                        : "Complaints loaded successfully.",
+                    "success"
+                );
+            }
+
+        } catch (error) {
+            setMessage(
+                "Unable to load complaints. " + error.message,
+                "error"
+            );
+
+            console.error("Error loading complaints:", error);
+
+        } finally {
+            refreshButton.disabled = false;
+        }
+    }
+
+    document.getElementById("searchInput").addEventListener(
+        "input",
+        renderComplaints
+    );
+
+    window.addEventListener("DOMContentLoaded", () => {
+        loadComplaints();
+    });
+</script>
 </body>
 </html>

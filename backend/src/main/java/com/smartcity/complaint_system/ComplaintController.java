@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -17,12 +18,16 @@ import java.util.Map;
 public class ComplaintController {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ComplaintLogRepository complaintLogRepository;
 
-    public ComplaintController(JdbcTemplate jdbcTemplate) {
+    public ComplaintController(
+            JdbcTemplate jdbcTemplate,
+            ComplaintLogRepository complaintLogRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.complaintLogRepository = complaintLogRepository;
     }
 
-    // Get all complaints
+    // Get all complaints from MySQL
     @GetMapping("/api/complaints")
     public List<Map<String, Object>> getComplaints() {
 
@@ -39,7 +44,7 @@ public class ComplaintController {
         return jdbcTemplate.queryForList(sql);
     }
 
-    // Update the status of a complaint
+    // Update complaint status and save a log in MongoDB
     @PutMapping("/api/complaints/{id}/status")
     public Map<String, Object> updateComplaintStatus(
             @PathVariable int id,
@@ -47,7 +52,7 @@ public class ComplaintController {
 
         String newStatus = request.get("status");
 
-        // Check the requested status
+        // Validate the requested status
         if (newStatus == null ||
             !(newStatus.equals("Pending") ||
               newStatus.equals("In Progress") ||
@@ -59,32 +64,49 @@ public class ComplaintController {
             );
         }
 
-        // Check whether the complaint exists
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM Complaints WHERE complaint_id = ?",
-            Integer.class,
+        // Get the current status from MySQL
+        List<String> statuses = jdbcTemplate.query(
+            "SELECT status FROM Complaints WHERE complaint_id = ?",
+            (rs, rowNum) -> rs.getString("status"),
             id
         );
 
-        if (count == null || count == 0) {
+        if (statuses.isEmpty()) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Complaint not found"
             );
         }
 
-        // Update the complaint status
-        String sql =
-            "UPDATE Complaints SET status = ?, " +
-            "resolved_date = CASE WHEN ? = 'Resolved' " +
-            "THEN CURRENT_TIMESTAMP ELSE NULL END " +
-            "WHERE complaint_id = ?";
+        String oldStatus = statuses.get(0);
 
-        jdbcTemplate.update(sql, newStatus, newStatus, id);
+        // Update MySQL only if the status has changed
+        if (!newStatus.equals(oldStatus)) {
+
+            String sql =
+                "UPDATE Complaints SET status = ?, " +
+                "resolved_date = CASE WHEN ? = 'Resolved' " +
+                "THEN CURRENT_TIMESTAMP ELSE NULL END " +
+                "WHERE complaint_id = ?";
+
+            jdbcTemplate.update(sql, newStatus, newStatus, id);
+
+            // Save the status change in MongoDB
+            ComplaintLog log = new ComplaintLog(
+                id,
+                oldStatus,
+                newStatus,
+                LocalDateTime.now(),
+                "Complaint status updated"
+            );
+
+            complaintLogRepository.save(log);
+        }
 
         return Map.of(
             "message", "Complaint status updated successfully",
             "complaint_id", id,
+            "old_status", oldStatus,
             "status", newStatus
         );
     }
